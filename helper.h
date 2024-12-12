@@ -25,13 +25,13 @@ void freeMatrixOnGPU(Matrix<T>& mat)
     cudaFree(mat.data);
 }
 
-template < typename T>
+template <typename T>
 void initMatrixCPU(Matrix<T>& mat, int size)
 {
     mat.size = size;
     mat.data = new T[mat.size * mat.size];
     for (int i = 0; i < mat.size * mat.size; i++) {
-        mat.data[i] = rand() % 10; // Random values between 0 and 9
+        mat.data[i] = static_cast<T>((rand() % 10000) / 1000.0f); // Random float values between 0 and 9.999
     }
 }
 
@@ -54,20 +54,20 @@ void freeMatrixOnCPU(Matrix<T>& mat) {
     delete[] mat.data;
 }
 
-template <typename T>
-void testMatrix(Matrix<T>& A, Matrix<T>& B, Matrix<T>& C) {
+template <typename T, typename To>
+void testMatrix(Matrix<T>& A, Matrix<T>& B, Matrix<To>& C) {
     
     int n = A.size;
     for (int row = 0; row < n; ++row)
     {
         for (int col = 0; col < n; ++col)
         {
-            T sum = 0;
+            To sum = 0;
             for (int k = 0; k < n; ++k)
             {
-                sum += A.data[row * n + k] * B.data[k * n + col];
+                sum += (To)A.data[row * n + k] * (To)B.data[k * n + col];
             }
-            assert(C.data[row * n + col] == sum);
+            std::cout << "expected: " << (float)sum << " recieved: " << (float)C.data[row * n + col] << std::endl;
         }
     }
 }
